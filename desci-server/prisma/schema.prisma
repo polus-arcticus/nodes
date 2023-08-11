@@ -39,6 +39,22 @@ model Node {
   @@index([uuid])
 }
 
+model Composition {
+  id  Int @id @default(autoincrement())
+  state               NodeState             @default(NEW)
+  isFeatured          Boolean               @default(false)
+  uuid                String?               @unique @default(uuid())
+  ownerId             Int
+  owner               User                  @relation(fields: [ownerId], references: [id])
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  title               String
+  cid                 String                @default("")
+  manifestUrl         String
+  @@index([ownerId])
+  @@index([uuid])
+}
+
 model NodeVersion {
   id                  Int                   @id @default(autoincrement())
   createdAt           DateTime              @default(now())
@@ -149,6 +165,7 @@ model User {
   invitesReceived            Invite[]              @relation("ReceivedInvites")
   invitesSent                Invite[]              @relation("SentInvites")
   ownedNodes                 Node[]
+  ownedCompositions  Composition[]
   authoredNodes              NodeAuthor[]
   nodeVotes                  NodeVote[]
   accessGrants               OauthAccessGrant[]
@@ -518,6 +535,15 @@ enum DataType {
   VIDEOS
   CODE_REPOS
   DOCUMENT
+}
+
+enum CompositionDataType {
+  RESEARCH_NODE
+  DATA
+  API
+  COMPUTE
+  UNKNOWN
+  MANIFEST
 }
 
 enum PublishState {

@@ -28,7 +28,7 @@ contract ResearchObject is VersionedERC721, OwnableUpgradeable {
         address _from,
         address,
         uint256
-    ) internal pure override {
+    ) internal pure  {
         require(_from == address(0), "no transfer");
     }
 

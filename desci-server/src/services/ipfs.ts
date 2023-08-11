@@ -107,6 +107,68 @@ export const getSizeForCid = async (cid: string, asDirectory: boolean | undefine
   return size;
 };
 
+export const downloadFilesAndMakeCompositionManifest = async ({ title, defaultLicense, pdf, code, researchFields }) => {
+  const pdfHashes = pdf ? await Promise.all(processUrls('pdf', getUrlsFromParam(pdf))) : [];
+  const codeHashes = code ? await Promise.all(processUrls('code', getUrlsFromParam(code))) : [];
+  const files = (await Promise.all([pdfHashes, codeHashes].flat())).flat();
+  logger.trace({ fn: 'downloadFilesAndMakeManifest' }, `downloadFilesAndMakeManifest ${files}`);
+
+  // make manifest
+
+  const researchObject: ResearchObjectV1 = {
+    version: 'desci-nodes-0.2.0',
+    components: [],
+    authors: [],
+  };
+
+  const emptyDagCid = await createEmptyDag();
+
+  const dataBucketComponent: ResearchObjectV1Component = {
+    id: 'root',
+    name: 'root',
+    type: ResearchObjectComponentType.DATA_BUCKET,
+    payload: {
+      cid: emptyDagCid,
+      path: DRIVE_NODE_ROOT_PATH,
+    },
+  };
+
+  const pdfComponents = (await pdfHashes).map((d: UrlWithCid) => {
+    const objectComponent: PdfComponent = {
+      id: d.cid,
+      name: 'Research Report',
+      type: ResearchObjectComponentType.PDF,
+      payload: {
+        url: makePublic([d])[0].val,
+        annotations: [],
+      },
+    };
+    return objectComponent;
+  });
+  const codeComponents = (await codeHashes).map((d: UrlWithCid) => {
+    const objectComponent: CodeComponent = {
+      id: d.cid,
+      name: 'Code',
+      type: ResearchObjectComponentType.CODE,
+      payload: {
+        language: 'bash',
+        code: makePublic([d])[0].val,
+      },
+    };
+    return objectComponent;
+  });
+  researchObject.title = title;
+  researchObject.defaultLicense = defaultLicense;
+  researchObject.researchFields = researchFields;
+  researchObject.components = researchObject.components.concat(dataBucketComponent, pdfComponents, codeComponents);
+
+  logger.debug({ fn: 'downloadFilesAndMakeManifest' }, 'RESEARCH OBJECT', JSON.stringify(researchObject));
+
+  const manifest = createManifest(researchObject);
+
+  return { files, pdfHashes, codeHashes, manifest, researchObject };
+};
+
 export const downloadFilesAndMakeManifest = async ({ title, defaultLicense, pdf, code, researchFields }) => {
   const pdfHashes = pdf ? await Promise.all(processUrls('pdf', getUrlsFromParam(pdf))) : [];
   const codeHashes = code ? await Promise.all(processUrls('code', getUrlsFromParam(code))) : [];
