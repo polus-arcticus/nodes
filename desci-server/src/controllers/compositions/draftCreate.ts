@@ -6,7 +6,7 @@ import { getDataUsageForUserBytes, hasAvailableDataUsageForUpload } from 'servic
 import {
 
   addBufferToIpfs,
-  downloadFilesAndMakeManifest,
+  makeCompositionManifest,
   downloadSingleFile,
   updateManifestAndAddToIpfs } from "services/ipfs"
 import { randomUUID64 } from 'utils';
@@ -58,18 +58,16 @@ export const draftCreate = async (req: Request, res: Response, next: NextFunctio
       throw Error('User ID mismatch');
     }
 
-    const { manifest, researchObject, files } = await downloadFilesAndMakeCompositionManifest({
+    const { manifest, composition  } = await makeCompositionManifest({
       title,
     });
     const { cid: hash } = await addBufferToIpfs(manifest, '');
     const uri = `${hash}`;
-    const node = await prisma.node.create({
+    const node = await prisma.composition.create({
       data: {
         title,
         uuid: randomUUID64(),
         manifestUrl: uri,
-        replicationFactor: 0,
-        restBody: JSON.stringify(req.body),
         ownerId: owner.id,
       },
     });
@@ -77,8 +75,8 @@ export const draftCreate = async (req: Request, res: Response, next: NextFunctio
     const dataConsumptionBytes = await getDataUsageForUserBytes(owner);
 
     // eslint-disable-next-line no-array-reduce/no-reduce
-    const uploadSizeBytes = files.map((f) => f.size).reduce((total, size) => total + size, 0);
-
+   // const uploadSizeBytes = files.map((f) => f.size).reduce((total, size) => total + size, 0);
+/*
     const hasStorageSpaceToUpload = await hasAvailableDataUsageForUpload(owner, { fileSizeBytes: uploadSizeBytes });
     if (!hasStorageSpaceToUpload) {
       res.send(400).json({
@@ -86,8 +84,8 @@ export const draftCreate = async (req: Request, res: Response, next: NextFunctio
       });
       return;
     }
-
-    const { nodeVersion } = await updateManifestAndAddToIpfs(researchObject, { userId: owner.id, nodeId: node.id });
+*/
+    const { nodeVersion } = await updateCompositionManifestAndAddToIpfs(composition, { userId: owner.id, compositionId: composition.id });
 
     const uploadedFiles: Partial<DataReference>[] = researchObject.components.map((component) => {
       const isDataBucket = component.type === CompositionObjectComponentType.DATA_BUCKET;

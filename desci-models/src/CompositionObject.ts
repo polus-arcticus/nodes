@@ -222,6 +222,17 @@ export interface TerminalComponent extends CompositionObjectV1Component {
   } & CommonComponentPayload;
 }
 */
+export type CompositionAnnotation = {
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+    pageIndex?: number;
+    move?: boolean;
+    id: string;
+    text?: string;
+    title?: string;
+};
 export type CompositionObjectComponentAnnotation = {
   startX: number;
   startY: number;

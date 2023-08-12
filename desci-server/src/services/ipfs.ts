@@ -1,10 +1,11 @@
 import fs from 'fs';
 import https from 'https';
 import { Readable } from 'stream';
-
 import {
   CodeComponent,
+  CompositionObjectV1Component,
   PdfComponent,
+  CompositionObjectV1,
   ResearchObjectComponentType,
   ResearchObjectV1,
   ResearchObjectV1Component,
@@ -63,6 +64,37 @@ export const publicIpfs = ipfs.create({ url: PUBLIC_IPFS_RESOLVER, agent, apiPat
 // Timeouts for resolution on internal and external IPFS nodes, to prevent server hanging, in ms.
 const INTERNAL_IPFS_TIMEOUT = 5000;
 const EXTERNAL_IPFS_TIMEOUT = 120000;
+export const updateCompositionManifestAndAddToIpfs = async (
+  manifest: CompositionObjectV1,
+  { userId, compositionId }: { userId: number; compositionId: number },
+): Promise<{ cid: string; size: number; ref: DataReference; nodeVersion: NodeVersion }> => {
+  const result = await addBufferToIpfs(createManifest(manifest), '');
+  const version = await prisma.nodeVersion.create({
+    data: {
+      manifestUrl: result.cid,
+      nodeId: compositionId,
+    },
+  });
+  logger.trace(
+    { fn: 'updateManifestAndAddToIpfs' },
+    `[ipfs::updateManifestAndAddToIpfs] manifestCid=${result.cid} nodeVersion=${version}`,
+  );
+  const ref = await prisma.dataReference.create({
+    data: {
+      cid: result.cid.toString(),
+      size: result.size,
+      root: false,
+      type: DataType.MANIFEST,
+      userId,
+      nodeId: compositionId,
+      // versionId: version.id,
+      directory: false,
+    },
+  });
+  logger.info({ fn: 'updateManifestAndAddToIpfs' }, '[dataReference Created]', ref);
+
+  return { cid: result.cid.toString(), size: result.size, ref, nodeVersion: version };
+};
 
 export const updateManifestAndAddToIpfs = async (
   manifest: ResearchObjectV1,
@@ -107,23 +139,18 @@ export const getSizeForCid = async (cid: string, asDirectory: boolean | undefine
   return size;
 };
 
-export const downloadFilesAndMakeCompositionManifest = async ({ title, defaultLicense, pdf, code, researchFields }) => {
-  const pdfHashes = pdf ? await Promise.all(processUrls('pdf', getUrlsFromParam(pdf))) : [];
-  const codeHashes = code ? await Promise.all(processUrls('code', getUrlsFromParam(code))) : [];
-  const files = (await Promise.all([pdfHashes, codeHashes].flat())).flat();
-  logger.trace({ fn: 'downloadFilesAndMakeManifest' }, `downloadFilesAndMakeManifest ${files}`);
-
+export const makeCompositionManifest = async ({ title }) => {
   // make manifest
 
-  const researchObject: ResearchObjectV1 = {
+  const composition: CompositionObjectV1 = {
     version: 'desci-nodes-0.2.0',
     components: [],
     authors: [],
   };
 
   const emptyDagCid = await createEmptyDag();
-
-  const dataBucketComponent: ResearchObjectV1Component = {
+/*
+  const dataBucketComponent: CompositionObjectV1Component = {
     id: 'root',
     name: 'root',
     type: ResearchObjectComponentType.DATA_BUCKET,
@@ -157,16 +184,14 @@ export const downloadFilesAndMakeCompositionManifest = async ({ title, defaultLi
     };
     return objectComponent;
   });
-  researchObject.title = title;
-  researchObject.defaultLicense = defaultLicense;
-  researchObject.researchFields = researchFields;
-  researchObject.components = researchObject.components.concat(dataBucketComponent, pdfComponents, codeComponents);
+  */
+  composition.title = title;
 
-  logger.debug({ fn: 'downloadFilesAndMakeManifest' }, 'RESEARCH OBJECT', JSON.stringify(researchObject));
+  logger.debug({ fn: 'downloadFilesAndMakeManifest' }, 'Composition', JSON.stringify(composition));
 
-  const manifest = createManifest(researchObject);
+  const manifest = createManifest(composition);
 
-  return { files, pdfHashes, codeHashes, manifest, researchObject };
+  return { manifest, composition };
 };
 
 export const downloadFilesAndMakeManifest = async ({ title, defaultLicense, pdf, code, researchFields }) => {
