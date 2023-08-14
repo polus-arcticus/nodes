@@ -62,12 +62,12 @@ export const draftCreate = async (req: Request, res: Response, next: NextFunctio
       throw Error('User ID mismatch');
     }
 
-    const { manifest, composition  } = await makeCompositionManifest({
+    const { manifest, composition:compositionObj  } = await makeCompositionManifest({
       title,
     });
     const { cid: hash } = await addBufferToIpfs(manifest, '');
     const uri = `${hash}`;
-    const node = await prisma.composition.create({
+    const composition = await prisma.composition.create({
       data: {
         title,
         uuid: randomUUID64(),
@@ -89,7 +89,7 @@ export const draftCreate = async (req: Request, res: Response, next: NextFunctio
       return;
     }
 */
-    const { nodeVersion } = await updateCompositionManifestAndAddToIpfs(composition, { userId: owner.id, compositionId: node.id });
+    const { compositionVersion } = await updateCompositionManifestAndAddToIpfs(compositionObj, { userId: owner.id, compositionId: composition.id });
 /*
     const uploadedFiles: Partial<DataReference>[] = researchObject.components.map((component) => {
       const isDataBucket = component.type === CompositionObjectComponentType.DATA_BUCKET;
@@ -114,15 +114,15 @@ export const draftCreate = async (req: Request, res: Response, next: NextFunctio
     }
 
 */
-    const nodeCopy = Object.assign({}, node);
-    nodeCopy.uuid = nodeCopy.uuid.replace(/\.$/, '');
+    const compositionCopy = Object.assign({}, composition);
+    compositionCopy.uuid = compositionCopy.uuid.replace(/\.$/, '');
 
     res.send({
       ok: true,
       hash,
       uri,
-      node: nodeCopy,
-      version: nodeVersion,
+      node: compositionCopy,
+      version: compositionVersion,
     });
     return;
   } catch (err) {

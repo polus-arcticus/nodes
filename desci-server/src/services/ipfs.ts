@@ -15,7 +15,7 @@ import * as dagPb from '@ipld/dag-pb';
 import { PBNode } from '@ipld/dag-pb/src/interface';
 import {
    DataReference, DataType, NodeVersion, Prisma,
-   
+   CompositionDataReference, CompositionDataType, CompositionVersion
  } from '@prisma/client';
 import axios from 'axios';
 // import CID from 'cids';
@@ -74,35 +74,35 @@ export const updateCompositionManifestAndAddToIpfs = async (
 ): Promise<{
   cid: string;
   size: number;
-  ref: DataReference;
-  nodeVersion: NodeVersion
+  ref: CompositionDataReference;
+  compositionVersion: CompositionVersion
 }> => {
   const result = await addBufferToIpfs(createManifest(manifest), '');
-  const version = await prisma.nodeVersion.create({
+  const version = await prisma.compositionVersion.create({
     data: {
       manifestUrl: result.cid,
-      nodeId: compositionId,
+      compositionId: compositionId,
     },
   });
   logger.trace(
-    { fn: 'updateManifestAndAddToIpfs' },
-    `[ipfs::updateManifestAndAddToIpfs] manifestCid=${result.cid} nodeVersion=${version}`,
+    { fn: 'updateCompositionManifestAndAddToIpfs' },
+    `[ipfs::updateCompositionManifestAndAddToIpfs] manifestCid=${result.cid} compositionVersion=${version}`,
   );
-  const ref = await prisma.dataReference.create({
+  const ref = await prisma.compositionDataReference.create({
     data: {
       cid: result.cid.toString(),
       size: result.size,
       root: false,
-      type: DataType.MANIFEST,
+      type: CompositionDataType.MANIFEST,
       userId,
-      nodeId: compositionId,
+      compositionId: compositionId,
       // versionId: version.id,
       directory: false,
     },
   });
-  logger.info({ fn: 'updateManifestAndAddToIpfs' }, '[dataReference Created]', ref);
+  logger.info({ fn: 'updateCompositionManifestAndAddToIpfs' }, '[compositionDataReference Created]', ref);
 
-  return { cid: result.cid.toString(), size: result.size, ref, nodeVersion: version };
+  return { cid: result.cid.toString(), size: result.size, ref, compositionVersion: version };
 };
 
 export const updateManifestAndAddToIpfs = async (
