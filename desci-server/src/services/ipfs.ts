@@ -13,7 +13,10 @@ import {
 } from '@desci-labs/desci-models';
 import * as dagPb from '@ipld/dag-pb';
 import { PBNode } from '@ipld/dag-pb/src/interface';
-import { DataReference, DataType, NodeVersion, Prisma } from '@prisma/client';
+import {
+   DataReference, DataType, NodeVersion, Prisma,
+   
+ } from '@prisma/client';
 import axios from 'axios';
 // import CID from 'cids';
 import * as ipfs from 'ipfs-http-client';
@@ -64,10 +67,16 @@ export const publicIpfs = ipfs.create({ url: PUBLIC_IPFS_RESOLVER, agent, apiPat
 // Timeouts for resolution on internal and external IPFS nodes, to prevent server hanging, in ms.
 const INTERNAL_IPFS_TIMEOUT = 5000;
 const EXTERNAL_IPFS_TIMEOUT = 120000;
+
 export const updateCompositionManifestAndAddToIpfs = async (
   manifest: CompositionObjectV1,
   { userId, compositionId }: { userId: number; compositionId: number },
-): Promise<{ cid: string; size: number; ref: DataReference; nodeVersion: NodeVersion }> => {
+): Promise<{
+  cid: string;
+  size: number;
+  ref: DataReference;
+  nodeVersion: NodeVersion
+}> => {
   const result = await addBufferToIpfs(createManifest(manifest), '');
   const version = await prisma.nodeVersion.create({
     data: {
@@ -146,45 +155,46 @@ export const makeCompositionManifest = async ({ title }) => {
     version: 'desci-nodes-0.2.0',
     components: [],
     authors: [],
+    researchObjectCids: []
   };
 
   const emptyDagCid = await createEmptyDag();
-/*
-  const dataBucketComponent: CompositionObjectV1Component = {
-    id: 'root',
-    name: 'root',
-    type: ResearchObjectComponentType.DATA_BUCKET,
-    payload: {
-      cid: emptyDagCid,
-      path: DRIVE_NODE_ROOT_PATH,
-    },
-  };
-
-  const pdfComponents = (await pdfHashes).map((d: UrlWithCid) => {
-    const objectComponent: PdfComponent = {
-      id: d.cid,
-      name: 'Research Report',
-      type: ResearchObjectComponentType.PDF,
+  /*
+    const dataBucketComponent: CompositionObjectV1Component = {
+      id: 'root',
+      name: 'root',
+      type: ResearchObjectComponentType.DATA_BUCKET,
       payload: {
-        url: makePublic([d])[0].val,
-        annotations: [],
+        cid: emptyDagCid,
+        path: DRIVE_NODE_ROOT_PATH,
       },
     };
-    return objectComponent;
-  });
-  const codeComponents = (await codeHashes).map((d: UrlWithCid) => {
-    const objectComponent: CodeComponent = {
-      id: d.cid,
-      name: 'Code',
-      type: ResearchObjectComponentType.CODE,
-      payload: {
-        language: 'bash',
-        code: makePublic([d])[0].val,
-      },
-    };
-    return objectComponent;
-  });
-  */
+  
+    const pdfComponents = (await pdfHashes).map((d: UrlWithCid) => {
+      const objectComponent: PdfComponent = {
+        id: d.cid,
+        name: 'Research Report',
+        type: ResearchObjectComponentType.PDF,
+        payload: {
+          url: makePublic([d])[0].val,
+          annotations: [],
+        },
+      };
+      return objectComponent;
+    });
+    const codeComponents = (await codeHashes).map((d: UrlWithCid) => {
+      const objectComponent: CodeComponent = {
+        id: d.cid,
+        name: 'Code',
+        type: ResearchObjectComponentType.CODE,
+        payload: {
+          language: 'bash',
+          code: makePublic([d])[0].val,
+        },
+      };
+      return objectComponent;
+    });
+    */
   composition.title = title;
 
   logger.debug({ fn: 'downloadFilesAndMakeManifest' }, 'Composition', JSON.stringify(composition));

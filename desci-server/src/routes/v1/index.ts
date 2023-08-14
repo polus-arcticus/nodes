@@ -12,6 +12,7 @@ import auth from './auth';
 import data from './data';
 import log from './log';
 import nodes from './nodes';
+import compositions from './compositions'
 import pub from './pub';
 import referral from './referral';
 import services from './services';
@@ -39,6 +40,7 @@ router.use('/admin', admin);
 router.use('/auth', auth);
 router.use('/users', users);
 router.use('/nodes', nodes);
+router.use('/compositions', compositions);
 router.use('/waitlist', waitlist);
 router.use('/pub', pub);
 router.use('/data', data);

@@ -8,7 +8,7 @@ import {
   addBufferToIpfs,
   makeCompositionManifest,
   downloadSingleFile,
-  updateManifestAndAddToIpfs } from "services/ipfs"
+  updateCompositionManifestAndAddToIpfs } from "services/ipfs"
 import { randomUUID64 } from 'utils';
 
 import {
@@ -17,8 +17,9 @@ import {
   CompositionObjectComponentLinkSubtype,
   CompositionObjectComponentType,
   CompositionObjectV1,
+  DRIVE_NODE_ROOT_PATH,
 } from '@desci-labs/desci-models';
-
+/*
 const componentTypeToDataType = (type: CompositionObjectComponentType): CompositionDataType => {
   switch (type) {
     case CompositionObjectComponentType.RESEARCH_NODE:
@@ -33,10 +34,13 @@ const componentTypeToDataType = (type: CompositionObjectComponentType): Composit
       throw Error('Unknown component type');
   }
 };
+*/
 export const draftCreate = async (req: Request, res: Response, next: NextFunction) => {
   const {
     title,
   } = req.body;
+  console.log('composition', CompositionDataType)
+  console.log('hmmm', CompositionDataType)
   const logger = parentLogger.child({
     // id: req.id,
     module: 'COMPOSITION::DraftCreateController',
@@ -85,16 +89,16 @@ export const draftCreate = async (req: Request, res: Response, next: NextFunctio
       return;
     }
 */
-    const { nodeVersion } = await updateCompositionManifestAndAddToIpfs(composition, { userId: owner.id, compositionId: composition.id });
-
+    const { nodeVersion } = await updateCompositionManifestAndAddToIpfs(composition, { userId: owner.id, compositionId: node.id });
+/*
     const uploadedFiles: Partial<DataReference>[] = researchObject.components.map((component) => {
       const isDataBucket = component.type === CompositionObjectComponentType.DATA_BUCKET;
-      const size = isDataBucket ? 0 : files.find((f) => f.cid === component.payload.url)?.size;
+      //const size = isDataBucket ? 0 : files.find((f) => f.cid === component.payload.url)?.size;
 
       const cid = isDataBucket ? component.payload.cid : component.payload.url;
       return {
         cid: cid,
-        size: size,
+        //size: size,
         root: isDataBucket,
         type: componentTypeToDataType(component.type),
         userId: owner.id,
@@ -104,12 +108,12 @@ export const draftCreate = async (req: Request, res: Response, next: NextFunctio
         // versionId: nodeVersion.id,
       };
     });
-
     if (uploadedFiles.length > 0) {
       const ref = await prisma.dataReference.createMany({ data: [...uploadedFiles] as DataReference[] });
       if (ref) logger.info(`${ref.count} data references added`);
     }
 
+*/
     const nodeCopy = Object.assign({}, node);
     nodeCopy.uuid = nodeCopy.uuid.replace(/\.$/, '');
 
