@@ -3,6 +3,7 @@
 seed: install
 	scripts/seed.sh "dpid registry" "unknown-dpid.json" "deploy:dpid:ganache"
 	scripts/seed.sh "research object" "unknown-research-object.json" "deploy:ganache"
+	scripts/seed.sh "composition object" "unknown-research-object.json" "deploy:ganache"
 
 build: install
 	yarn build

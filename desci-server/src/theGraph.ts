@@ -18,6 +18,19 @@ export const getIndexedResearchObjects = async (urlSafe64s: string[]) => {
   }`;
   return query(q);
 };
+export const getIndexedCompositionObjects = async (
+  urlSafe64s: string[]
+  ) => {
+  const hex = urlSafe64s.map(decodeBase64UrlSafeToHex).map((h) => `0x${h}`);
+  const q = `{
+    compositions(where: { id_in: ["${hex.join('","')}"]}) {
+      id, owner, versions(orderBy: time, orderDirection: desc) {
+        cid, id, time
+      }
+    } 
+  }`;
+  return query(q);
+};
 
 export const query = async (query: string) => {
   const payload = JSON.stringify({

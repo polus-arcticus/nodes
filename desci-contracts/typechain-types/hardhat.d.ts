@@ -73,6 +73,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
+      name: "CompositionObject",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CompositionObject__factory>;
+    getContractFactory(
       name: "DpidRegistry",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DpidRegistry__factory>;
@@ -168,6 +172,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
+    getContractAt(
+      name: "CompositionObject",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CompositionObject>;
     getContractAt(
       name: "DpidRegistry",
       address: string,

@@ -5,37 +5,31 @@ import { Request, Response, NextFunction } from 'express';
 
 import prisma from 'client';
 import parentLogger from 'logger';
-import { getIndexedResearchObjects } from 'theGraph';
+import { getIndexedCompositionObjects } from 'theGraph';
 import { decodeBase64UrlSafeToHex, encodeBase64UrlSafe, randomUUID64 } from 'utils';
 
 export const list = async (req: Request, res: Response, next: NextFunction) => {
   const owner = (req as any).user;
   const logger = parentLogger.child({
     // id: req.id,
-    module: 'COMPOSITIONSs::listController',
+    module: 'COMPOSITIONS::listController',
     body: req.body,
     user: (req as any).user,
   });
-
   let compositions = await prisma.composition.findMany({
-    select: {
-      uuid: true,
-      id: true,
-      createdAt: true,
-      updatedAt: true,
-      ownerId: true,
-      title: true,
-      manifestUrl: true,
-      cid: true,
-    },
     where: {
       ownerId: owner.id,
     },
     orderBy: { updatedAt: 'desc' },
   });
-
+  logger.info('-----------------------------------')
+  logger.info(compositions)
+  logger.info('-----------------------------------')
+  res.send({compositions});
   // transition UUID
+  /*
   const ns = compositions.filter((a) => !a.uuid);
+  console.log('ns', ns)
   if (ns.length) {
     await Promise.all(
       ns.map(
@@ -68,11 +62,12 @@ export const list = async (req: Request, res: Response, next: NextFunction) => {
       orderBy: { updatedAt: 'desc' },
     });
   }
-  const indexMap = {};
+  //const indexMap = {};
+  /*
   try {
     const uuids = compositions.map((n) => n.uuid);
-    const indexed = await getIndexedResearchObjects(uuids);
-    indexed.researchObjects.forEach((e) => {
+    const indexed = await getIndexedCompositionObjects(uuids)
+    indexed.compositions.forEach((e) => {
       indexMap[e.id] = e;
     });
   } catch (err) {
@@ -87,5 +82,5 @@ export const list = async (req: Request, res: Response, next: NextFunction) => {
 
     return o;
   });
-  res.send({ compositions });
+  */
 };

@@ -58,6 +58,7 @@ contract DpidRegistry is OwnableUpgradeable, IDpidRegistry {
         __registerOrg("beta", DEFAULT_BLANK);
         __registerOrg("desci", DEFAULT_BLANK);
         __registerOrg("node", DEFAULT_BLANK);
+        __registerOrg("composition", DEFAULT_BLANK);
         __registerOrg("nodes", DEFAULT_BLANK);
         __registerOrg("doi", DEFAULT_BLANK);
         __registerOrg("a", DEFAULT_BLANK);

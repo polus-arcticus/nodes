@@ -75,7 +75,6 @@ export const draftCreate = async (req: Request, res: Response, next: NextFunctio
         ownerId: owner.id,
       },
     });
-
     const dataConsumptionBytes = await getDataUsageForUserBytes(owner);
 
     // eslint-disable-next-line no-array-reduce/no-reduce

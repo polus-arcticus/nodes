@@ -14,3 +14,18 @@ type ResearchObject @entity {
   recentCid: String!
   versions: [ResearchObjectVersion!]! @derivedFrom(field: "researchObject")
 }
+type CompositionVersion @entity {
+  id: ID!
+  time: BigInt!
+  cid: String!
+  from: String!
+  composition: Composition!
+
+}
+type Composition @entity {
+  id: ID!
+  id64: String!
+  id10: String!
+  owner: String!
+  recentCid: String!
+}
