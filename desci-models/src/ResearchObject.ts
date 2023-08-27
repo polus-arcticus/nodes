@@ -127,6 +127,7 @@ export enum ResearchObjectComponentType {
   TERMINAL = "terminal", // not used, TODO: remove
   DATA = "data",
   LINK = "link", // external link
+  KAMU_MANIFEST = 'kamu-manifest'
 }
 
 export enum ResearchObjectComponentDocumentSubtype {
