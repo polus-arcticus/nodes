@@ -153,6 +153,15 @@ services:
     volumes:
       - ./local-data/redis:/data
 
+  kamu:
+    image: ghcr.io/kamu-data/kamu-base:latest-with-data
+    container_name: "kamu"
+    ports:
+      - "3080:3080"
+      - "39189:39189"
+    command: kamu system api-server --http-port 3080 --address 0.0.0.0
+
+
 
   # desci_nodes_backend_test:
   #   container_name: 'be_test_boilerplate'

@@ -60,7 +60,6 @@ export const show = async (req: Request, res: Response, next: NextFunction) => {
     shareId,
     user: (req as any).user,
   });
-
   if (shareId) {
     const privateShare = await prisma.privateShare.findFirst({
       where: { shareId },
@@ -88,14 +87,24 @@ export const show = async (req: Request, res: Response, next: NextFunction) => {
     } catch (e) {
       uuid = (pid.substring(RESEARCH_OBJECT_NODES_PREFIX.length) || '').toString();
     }
+    logger.info('herea')
+    logger.info(`uuid: ${uuid}`)
+    logger.info(`ownerId: ${ownerId}`)
+    logger.info(await prisma.node.findFirst({
+      where: {
+        uuid
+      }
+    }))
     const discovery = await prisma.node.findFirst({
       where: {
-        id: uuid ? undefined : id,
+        //id: uuid ? undefined : id,
         uuid: uuid + '.',
         ownerId,
       },
     });
-
+    logger.info('==============')
+    logger.info(`test- discovery: ${discovery}`) 
+    logger.info('==============')
     if (!discovery) {
       res.sendStatus(403);
       return;
@@ -130,6 +139,7 @@ export const show = async (req: Request, res: Response, next: NextFunction) => {
     // example
     const discovery = await prisma.node.findFirst();
     discovery.manifestUrl = `${process.env.SERVER_URL}/v1/ipfs/read/test`;
+    logger.info(`manifesturl: ${discovery.manifestUrl}`)
     res.send(discovery);
   }
 };

@@ -4,6 +4,10 @@ desci-ipfs
 desci-server/tmp/
 desci-server/temp_downloads
 desci-art-viewer/dist/*
+desci-models/.pnp.cjs
+desci-models/.pnp.loader.mjs
+desci-models/.yarn
+desci-server/.yarn
 desci-nodes-mirror
 .VSCodeCounter
 tmp

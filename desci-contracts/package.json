@@ -14,7 +14,7 @@
     "graph:build": "graph build subgraph/subgraph.yaml",
     "graph:create-local": "graph create nodes --node http://127.0.0.1:8020 subgraph/subgraph.yaml",
     "graph:deploy-local": "graph deploy nodes --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020 -l v0.0.1 subgraph/subgraph.yaml",
-    "graph:create-docker": "graph create nodes --node http://host.docker.internal:8020 subgraph/subgraph.yaml",
+    "graph:create-docker": "graph create nodes --node http://host.docker.internal:8020",
     "graph:deploy-docker": "graph deploy nodes --ipfs http://host.docker.internal:5001 --node http://host.docker.internal:8020 -l v0.0.1 subgraph/subgraph.yaml",
     "graph:create-dev-local": "cp subgraph/subgraph.local.yaml subgraph/subgraph.yaml && graph create nodes --node http://127.0.0.1:8020",
     "graph:deploy-dev-local": "cp subgraph/subgraph.local.yaml subgraph/subgraph.yaml && graph deploy nodes --ipfs http://127.0.0.1:5001 --node http://127.0.0.1:8020",
