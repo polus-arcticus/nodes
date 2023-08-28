@@ -570,6 +570,7 @@ enum NodeState {
 
 enum DataType {
   DATA_BUCKET
+  KAMU_MANIFEST
   MANIFEST
   UNKNOWN
   DATASET

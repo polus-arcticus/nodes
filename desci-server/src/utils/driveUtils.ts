@@ -233,6 +233,7 @@ export const ROTypesToPrismaTypes = {
   [ResearchObjectComponentType.CODE]: DataType.CODE_REPOS,
   [ResearchObjectComponentType.VIDEO]: DataType.VIDEOS,
   [ResearchObjectComponentType.DATA_BUCKET]: DataType.DATA_BUCKET,
+  [ResearchObjectComponentType.KAMU_MANIFEST]: DataType.KAMU_MANIFEST
 };
 
 export function generateManifestPathsToDbTypeMap(manifest: ResearchObjectV1) {

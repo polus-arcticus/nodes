@@ -104,6 +104,7 @@ export const update = async (req: Request, res: Response<UpdateResponse | ErrorR
     externalCids,
     files: req.files,
   });
+  logger.info(`dataReference::update::componentType::${componentType}`)
   logger.trace(`[UPDATE DATASET] Updating in context: ${contextPath}`);
   if (uuid === undefined || manifest === undefined || contextPath === undefined)
     return res.status(400).json({ error: 'uuid, manifest, contextPath required' });
